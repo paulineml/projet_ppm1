@@ -18,30 +18,38 @@ FILE *filtragePpmFile(void);
 FILE *outputPpmFile(void);
 
 int main(void) {
-	FILE *ppmFile;
+	FILE *ppmFileIn;
+	FILE *ppmFileOut;
 
 	printf("%s-%03d: !!!Hello World!!!\n", __FILE__, __LINE__);
 	printf("%s-%03d: read ppm file\n", __FILE__, __LINE__);
-	ppmFile = readPpmFile();
+	ppmFileIn = readPpmFile();
 	printf("%s-%03d: parse ppm file\n", __FILE__, __LINE__);
-	ppmFile = parsePpmFile();
+	//tabPixels = parsePpmFile(ppmFileIn);
 	printf("%s-%03d: seuillage\n", __FILE__, __LINE__);
-	ppmFile = seuillagePpmFile();
+	//ppmFile = seuillagePpmFile();
 	printf("%s-%03d: boucles de filtrage\n", __FILE__, __LINE__);
-	ppmFile = filtragePpmFile();
+	//ppmFile = filtragePpmFile();
 	printf("%s-%03d: ppm file output\n", __FILE__, __LINE__);
-	ppmFile = outputPpmFile();
+	//ppmFileOut = outputPpmFile();
+	printf("%s-%03d: display ppm file output\n", __FILE__, __LINE__);
+	//ppmFileOut = outputPpmFile();
 	printf("%s-%03d: !!!That\'s all folks!!!\n", __FILE__, __LINE__);
 
 	return EXIT_SUCCESS;
 
-
 }
 
 FILE *readPpmFile(void) {
-	FILE *fp = 0;
+	FILE *fp;
+	char filename[100];
 	printf("%s-%03d:   readPpmFile start\n", __FILE__, __LINE__);
+	printf("%s-%03d:   Nom du fichier d\'entrée?\n", __FILE__, __LINE__);
+	scanf("%s", &filename);
+	printf("%s-%03d:   Nom du fichier d\'entrée: %s\n", __FILE__, __LINE__, filename);
+	fp = fopen(filename, "rb");
 	printf("%s-%03d:   readPpmFile end\n", __FILE__, __LINE__);
+
 	return fp;
 }
 FILE *parsePpmFile(void) {
