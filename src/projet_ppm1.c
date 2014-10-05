@@ -7,6 +7,7 @@
  Description : Hello World in C, Ansi-style
  ============================================================================
  */
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -43,7 +44,7 @@ int main(void) {
 	PPMImage *img = parsePpmFile(ppmFileIn);
 	logImage(img);
 	printf("%s-%03d: seuillage\n", __FILE__, __LINE__);
-	//ppmFile = seuillagePpmFile();
+	FILE *seuillagePpmFile(void);  //ppmFile = seuillagePpmFile();
 	printf("%s-%03d: boucles de filtrage\n", __FILE__, __LINE__);
 	//ppmFile = filtragePpmFile();
 	printf("%s-%03d: ppm file output\n", __FILE__, __LINE__);
@@ -166,7 +167,7 @@ PPMImage * parsePpmFile(FILE *fp) {
 		img->data[i].green = green;
 		img->data[i].blue = blue;
 		/*printf("%s-%03d:   [%d] %d %d %d\n", __FILE__, __LINE__, i,
-				img->data[i].red, img->data[i].green, img->data[i].blue);*/
+		 img->data[i].red, img->data[i].green, img->data[i].blue);*/
 		i++;
 	}
 
@@ -177,7 +178,26 @@ PPMImage * parsePpmFile(FILE *fp) {
 
 FILE *seuillagePpmFile(void) {
 	FILE *fp = 0;
+	int i;
+	int intensity;
+	PPMImage *img;
+
 	printf("%s-%03d:   parsePpmFile start\n", __FILE__, __LINE__);
+	for (i = 0; i < img->x * img->y; i++) {
+		intensity = sqrt(
+				(img->data[i].red * img->data[i].red)
+						+ (img->data[i].green * img->data[i].green)
+						+ (img->data[i].blue * img->data[i].blue));
+		if (intensity < 0.3) {
+			i = 0;
+		} else if (intensity > 0.7) {
+			i = 2;
+		} else if (intensity == img->x) { //le seuil N°nbR est implicitement 1. et il est inclus dans le dernier intervalle
+			i = 2;
+		} else {
+			i = 1;
+		}
+	}
 	printf("%s-%03d:   parsepmFile end\n", __FILE__, __LINE__);
 	return fp;
 }
