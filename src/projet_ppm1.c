@@ -22,10 +22,11 @@ typedef struct {
 #define RGB_COMPONENT_COLOR 255
 
 FILE *readPpmFile(void);
-int parsePpmFile(FILE *fp);
+PPMImage * parsePpmFile(FILE *fp);
 FILE *seuillagePpmFile(void);
 FILE *filtragePpmFile(void);
 FILE *outputPpmFile(void);
+void logImage(PPMImage *img);
 
 // http://stackoverflow.com/questions/2693631/read-ppm-file-and-store-it-in-an-array-coded-with-c
 int main(void) {
@@ -40,8 +41,7 @@ int main(void) {
 	printf("%s-%03d: read ppm file\n", __FILE__, __LINE__);
 	ppmFileIn = readPpmFile();
 	printf("%s-%03d: parse ppm file\n", __FILE__, __LINE__);
-	parsePpmFile(ppmFileIn);
-	//tabPixels = parsePpmFile(ppmFileIn);
+	PPMImage *img = parsePpmFile(ppmFileIn);
 	printf("%s-%03d: seuillage\n", __FILE__, __LINE__);
 	//ppmFile = seuillagePpmFile();
 	printf("%s-%03d: boucles de filtrage\n", __FILE__, __LINE__);
@@ -74,7 +74,8 @@ FILE *readPpmFile(void) {
 
 	return fp;
 }
-int parsePpmFile(FILE *fp) {
+
+PPMImage * parsePpmFile(FILE *fp) {
 	char buff[16];
 	int c, rgb_comp_color;
 	PPMImage *img;
@@ -160,7 +161,7 @@ int parsePpmFile(FILE *fp) {
 
 	fclose(fp);
 	printf("%s-%03d:   parsepmFile end\n", __FILE__, __LINE__);
-	return 0;
+	return img;
 }
 
 FILE *seuillagePpmFile(void) {
