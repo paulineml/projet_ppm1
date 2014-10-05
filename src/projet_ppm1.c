@@ -64,7 +64,7 @@ FILE *readPpmFile(void) {
 	scanf("%s", filename);
 	printf("%s-%03d:   Nom du fichier d\'entrée: %s\n", __FILE__, __LINE__,
 			filename);
-	fp = fopen(filename, "r");
+	fp = fopen(filename, "rb");
 	if (!fp) {
 		fprintf(stderr, "%s-%03d: Unable to open file '%s'\n", __FILE__,
 		__LINE__, filename);
@@ -152,22 +152,11 @@ PPMImage * parsePpmFile(FILE *fp) {
 		exit(1);
 	}
 
-	printf("%s-%03d:   read pixel data from P3 file\n", __FILE__, __LINE__);
-	/* P6 (binary) if (fread(img->data, 3 * img->x, img->y, fp) != img->y) {
-	 fprintf(stderr, "%s-%03d:   Error loading image\n", __FILE__,
-	 __LINE__);
-	 exit(1);
-	 }*/
-	int red, green, blue;
-	int i = 0;
-
-	while (fscanf(fp, "%d %d %d", &red, &green, &blue) == 3) {
-		img->data[i].red = red;
-		img->data[i].green = green;
-		img->data[i].blue = blue;
-		printf("%s-%03d:   [%d] %d %d %d\n", __FILE__, __LINE__, i,
-				img->data[i].red, img->data[i].green, img->data[i].blue);
-		i++;
+	printf("%s-%03d:   read pixel data from file\n", __FILE__, __LINE__);
+	if (fread(img->data, 3 * img->x, img->y, fp) != img->y) {
+		fprintf(stderr, "%s-%03d:   Error loading image\n", __FILE__,
+		__LINE__);
+		exit(1);
 	}
 
 	fclose(fp);
