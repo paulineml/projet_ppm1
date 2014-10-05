@@ -119,7 +119,7 @@ int parsePpmFile(FILE *fp) {
 	printf("%s-%03d:   read image size information\n", __FILE__, __LINE__);
 	if (fscanf(fp, "%d %d", &img->x, &img->y) != 2) {
 		fprintf(stderr, "%s-%03d:   Invalid image size (error loading)\n",
-				__FILE__, __LINE__);
+		__FILE__, __LINE__);
 		exit(1);
 	} else {
 		printf("%s-%03d:   col: %d, row: %d\n", __FILE__, __LINE__, img->x,
@@ -129,51 +129,54 @@ int parsePpmFile(FILE *fp) {
 	printf("%s-%03d:   read rgb component\n", __FILE__, __LINE__);
 	if (fscanf(fp, "%d", &rgb_comp_color) != 1) {
 		fprintf(stderr, "%s-%03d:   Invalid rgb component (error loading')\n",
-				__FILE__,
-				__LINE__);
+		__FILE__,
+		__LINE__);
 		exit(1);
 	}
 
 	printf("%s-%03d:   check rgb component depth\n", __FILE__, __LINE__);
 	if (rgb_comp_color != RGB_COMPONENT_COLOR) {
 		fprintf(stderr, "%s-%03d:   file does not have 8-bits components\n",
-				__FILE__, __LINE__);
+		__FILE__, __LINE__);
 		exit(1);
 	}
 
-	/*while (fgetc(fp) != '\n')
-	 ;
-	 //memory allocation for pixel data
-	 img->data = (PPMPixel*) malloc(img->x * img->y * sizeof(PPMPixel));
+	while (fgetc(fp) != '\n')
+		;
+	printf("%s-%03d:   memory allocation for pixel data\n", __FILE__, __LINE__);
+	img->data = (PPMPixel*) malloc(img->x * img->y * sizeof(PPMPixel));
 
-	 if (!img) {
-	 fprintf(stderr, "Unable to allocate memory\n");
-	 exit(1);
-	 }
+	if (!img) {
+		fprintf(stderr, "%s-%03d:   Unable to allocate memory\n", __FILE__,
+				__LINE__);
+		exit(1);
+	}
 
-	 //read pixel data from file
-	 if (fread(img->data, 3 * img->x, img->y, fp) != img->y) {
-	 fprintf(stderr, "Error loading image '%s'\n", filename);
-	 exit(1);
-	 }
-	 */
+	printf("%s-%03d:   read pixel data from file\n", __FILE__, __LINE__);
+	if (fread(img->data, 3 * img->x, img->y, fp) != img->y) {
+		fprintf(stderr, "Error loading image\n");
+		exit(1);
+	}
 
 	fclose(fp);
 	printf("%s-%03d:   parsepmFile end\n", __FILE__, __LINE__);
 	return 0;
 }
+
 FILE *seuillagePpmFile(void) {
 	FILE *fp = 0;
 	printf("%s-%03d:   parsePpmFile start\n", __FILE__, __LINE__);
 	printf("%s-%03d:   parsepmFile end\n", __FILE__, __LINE__);
 	return fp;
 }
+
 FILE *filtragePpmFile(void) {
 	FILE *fp = 0;
 	printf("%s-%03d:   parsePpmFile start\n", __FILE__, __LINE__);
 	printf("%s-%03d:   parsepmFile end\n", __FILE__, __LINE__);
 	return fp;
 }
+
 FILE *outputPpmFile(void) {
 	FILE *fp = 0;
 	printf("%s-%03d:   parsePpmFile start\n", __FILE__, __LINE__);
