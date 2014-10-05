@@ -31,7 +31,6 @@ void logImage(PPMImage *img);
 // http://stackoverflow.com/questions/2693631/read-ppm-file-and-store-it-in-an-array-coded-with-c
 int main(void) {
 	FILE *ppmFileIn;
-	FILE *ppmFileOut;
 
 	// http://www.eclipse.org/forums/index.php/t/168233/
 	setvbuf(stdout, NULL, _IONBF, 0);
@@ -42,6 +41,7 @@ int main(void) {
 	ppmFileIn = readPpmFile();
 	printf("%s-%03d: parse ppm file\n", __FILE__, __LINE__);
 	PPMImage *img = parsePpmFile(ppmFileIn);
+	logImage(img);
 	printf("%s-%03d: seuillage\n", __FILE__, __LINE__);
 	//ppmFile = seuillagePpmFile();
 	printf("%s-%03d: boucles de filtrage\n", __FILE__, __LINE__);
@@ -61,7 +61,7 @@ FILE *readPpmFile(void) {
 	char filename[100];
 	printf("%s-%03d:   readPpmFile start\n", __FILE__, __LINE__);
 	printf("%s-%03d:   Nom du fichier d\'entrée?\n", __FILE__, __LINE__);
-	scanf("%s", &filename);
+	scanf("%s", filename);
 	printf("%s-%03d:   Nom du fichier d\'entrée: %s\n", __FILE__, __LINE__,
 			filename);
 	fp = fopen(filename, "rb");
@@ -130,8 +130,7 @@ PPMImage * parsePpmFile(FILE *fp) {
 	printf("%s-%03d:   read rgb component\n", __FILE__, __LINE__);
 	if (fscanf(fp, "%d", &rgb_comp_color) != 1) {
 		fprintf(stderr, "%s-%03d:   Invalid rgb component (error loading')\n",
-		__FILE__,
-		__LINE__);
+		__FILE__, __LINE__);
 		exit(1);
 	}
 
@@ -149,13 +148,14 @@ PPMImage * parsePpmFile(FILE *fp) {
 
 	if (!img) {
 		fprintf(stderr, "%s-%03d:   Unable to allocate memory\n", __FILE__,
-				__LINE__);
+		__LINE__);
 		exit(1);
 	}
 
 	printf("%s-%03d:   read pixel data from file\n", __FILE__, __LINE__);
 	if (fread(img->data, 3 * img->x, img->y, fp) != img->y) {
-		fprintf(stderr, "Error loading image\n");
+		fprintf(stderr, "%s-%03d:   Error loading image\n", __FILE__,
+		__LINE__);
 		exit(1);
 	}
 
@@ -183,4 +183,25 @@ FILE *outputPpmFile(void) {
 	printf("%s-%03d:   parsePpmFile start\n", __FILE__, __LINE__);
 	printf("%s-%03d:   parsepmFile end\n", __FILE__, __LINE__);
 	return fp;
+}
+
+void logImage(PPMImage *img) {
+	int i;
+
+	printf("P3\n");
+	printf("%d %d\n", img->x, img->y);
+	printf("255\n");
+
+	/*for (x = 0; x < img->x; x+=3);
+	 {
+	 for (y = 0; y < img->y; y++);
+
+	 {
+	 printf("%d %d %d\n", img->data[x].red, img->data[x].green, img->data[x].blue);
+	 }
+	 }*/
+	for (i = 0; i < img->x * img->y; i++) {
+		printf("[%d,%d] %d %d %d\n", i % img->y, i / img->y, img->data[i].red,
+				img->data[i].green, img->data[i].blue);
+	}
 }
