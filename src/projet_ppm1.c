@@ -32,7 +32,7 @@ void logImage(PPMImage *img);
 int main(void) {
 	FILE *ppmFileIn;
 
-	// http://www.eclipse.org/forums/index.php/t/168233/
+	// cygwin stuff: http://www.eclipse.org/forums/index.php/t/168233/
 	setvbuf(stdout, NULL, _IONBF, 0);
 	setvbuf(stderr, NULL, _IONBF, 0);
 
@@ -165,8 +165,8 @@ PPMImage * parsePpmFile(FILE *fp) {
 		img->data[i].red = red;
 		img->data[i].green = green;
 		img->data[i].blue = blue;
-		printf("%s-%03d:   [%d] %d %d %d\n", __FILE__, __LINE__, i,
-				img->data[i].red, img->data[i].green, img->data[i].blue);
+		/*printf("%s-%03d:   [%d] %d %d %d\n", __FILE__, __LINE__, i,
+				img->data[i].red, img->data[i].green, img->data[i].blue);*/
 		i++;
 	}
 
