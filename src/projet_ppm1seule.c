@@ -5,46 +5,45 @@
  Version     :
  Copyright   : Your copyright notice
  Description : Hello World in C, Ansi-style
+
  ============================================================================
  */
-
-/*
-	File : recolor.c
-	Nom    : Maury Laribière
-	Prenom : Pauline
-	CAMIPRO: 246491
-	Date   : 08.10.2014
-	Version code: 1.00
-	Version de la donnée: 1.03
-	Description : projet recolor. lit une table de couleurs
-	 et des seuils pour transformer une image en format ppm
-*/
 
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct {
-	unsigned char red, green, blue;
-	int x, y;
-} PPMPixel;
-
-typedef struct {
-	int x, y;
-	PPMPixel *data;
-} PPMImage;
-
 #define RGB_COMPONENT_COLOR 255
 #define TOLERANCE_SEUIL 0.005f    //// différence minimum entre 2 seuils successifs
 
+typedef struct {
+	unsigned char red, green, blue;
+} PPMPIXEL;
+
+typedef struct {
+	int x, y;
+	PPMPIXEL *data;
+} PPMIMAGE;
+
+
 FILE *readPpmFile(void);
-PPMImage * parsePpmFile(FILE *fp);
+PPMIMAGE *parsePpmFile(FILE *fp);
 FILE *seuillagePpmFile(void);
 FILE *filtragePpmFile(void);
 FILE *outputPpmFile(void);
-void logImage(PPMImage *img);
+void logImage(PPMIMAGE *img);
+
+// fonctions prédéfinies pour indiquer si les données sont correctes
+static void correct(void);
+static void erreur_nbR(int nbR);
+static void erreur_couleur(float couleur);
+static void erreur_seuil(float seuil);
+static void erreur_seuil_non_croissant(float s1, float s2);
+static void erreur_seuil_non_distinct(float s1, float s2);
+
 
 // http://stackoverflow.com/questions/2693631/read-ppm-file-and-store-it-in-an-array-coded-with-c
+
 int main(void) {
 	FILE *ppmFileIn;
 
@@ -53,19 +52,26 @@ int main(void) {
 	setvbuf(stderr, NULL, _IONBF, 0);
 
 	printf("%s-%03d: !!!Hello World!!!\n", __FILE__, __LINE__);
+
 	printf("%s-%03d: read ppm file\n", __FILE__, __LINE__);
 	ppmFileIn = readPpmFile();
 	printf("%s-%03d: parse ppm file\n", __FILE__, __LINE__);
-	PPMImage *img = parsePpmFile(ppmFileIn);
+	PPMIMAGE *img = parsePpmFile(ppmFileIn);
 	logImage(img);
+	static void correct(void);                                        //fonction du prof
+
 	printf("%s-%03d: seuillage\n", __FILE__, __LINE__);
 	FILE *seuillagePpmFile(void);  //ppmFile = seuillagePpmFile();
+
 	printf("%s-%03d: boucles de filtrage\n", __FILE__, __LINE__);
 	//ppmFile = filtragePpmFile();
+
 	printf("%s-%03d: ppm file output\n", __FILE__, __LINE__);
 	//ppmFileOut = outputPpmFile();
+
 	printf("%s-%03d: display ppm file output\n", __FILE__, __LINE__);
 	//ppmFileOut = outputPpmFile();
+
 	printf("%s-%03d: !!!That\'s all folks!!!\n", __FILE__, __LINE__);
 
 	return EXIT_SUCCESS;
@@ -91,10 +97,10 @@ FILE *readPpmFile(void) {
 	return fp;
 }
 
-PPMImage * parsePpmFile(FILE *fp) {
+PPMIMAGE * parsePpmFile(FILE *fp) {
 	char buff[16];
 	int c, rgb_comp_color;
-	PPMImage *img;
+	PPMIMAGE *img;
 
 	printf("%s-%03d:   parsePpmFile start\n", __FILE__, __LINE__);
 
@@ -116,8 +122,7 @@ PPMImage * parsePpmFile(FILE *fp) {
 	}
 
 	printf("%s-%03d:   alloc memory form image\n", __FILE__, __LINE__);
-
-	img = (PPMImage *) malloc(sizeof(PPMImage));
+	img = (PPMIMAGE *) malloc(sizeof(PPMIMAGE));
 	if (!img) {
 		fprintf(stderr, "%s-%03d:   Unable to allocate memory\n", __FILE__,
 		__LINE__);
@@ -132,6 +137,40 @@ PPMImage * parsePpmFile(FILE *fp) {
 		c = getc(fp);
 	}
 
+	printf("%s-%03d:   read rgb component\n", __FILE__, __LINE__);
+	if (fscanf(fp, "%d", &rgb_comp_color) != 1) {
+		static void erreur_couleur(float couleur);                              //fonction du prof
+		fprintf(stderr, "%s-%03d:   Invalid rgb component (error loading')\n",
+		__FILE__, __LINE__);
+		exit(1);
+	}
+
+	printf("%s-%03d:   check rgb component depth\n", __FILE__, __LINE__);
+	if (rgb_comp_color != RGB_COMPONENT_COLOR) {
+		fprintf(stderr, "%s-%03d:   file does not have 8-bits components\n",
+		__FILE__, __LINE__);
+		static void erreur_nbR(int nbR)                                        //fonction du prof
+		exit(1);
+	}
+
+
+	/*
+	if seuil pas compris entre 0 et 1 {
+	static void erreur_seuil(float seuil);
+	}
+
+	if si s1 > s2, ou s1 et s2 sont 2 seuils consécutifs {
+	static void erreur_seuil_non_croissant(float s1, float s2);
+	}
+
+
+	if écart entre 2 seuils consécutifs est strictement inférieur à  la valeur TOLERANCE_SEUIL {
+	static void erreur_seuil_non_distinct(float s1, float s2);
+	}
+
+*/
+
+
 	ungetc(c, fp);
 	printf("%s-%03d:   read image size information\n", __FILE__, __LINE__);
 	if (fscanf(fp, "%d %d", &img->x, &img->y) != 2) {
@@ -143,24 +182,10 @@ PPMImage * parsePpmFile(FILE *fp) {
 				img->y);
 	}
 
-	printf("%s-%03d:   read rgb component\n", __FILE__, __LINE__);
-	if (fscanf(fp, "%d", &rgb_comp_color) != 1) {
-		fprintf(stderr, "%s-%03d:   Invalid rgb component (error loading')\n",
-		__FILE__, __LINE__);
-		exit(1);
-	}
-
-	printf("%s-%03d:   check rgb component depth\n", __FILE__, __LINE__);
-	if (rgb_comp_color != RGB_COMPONENT_COLOR) {
-		fprintf(stderr, "%s-%03d:   file does not have 8-bits components\n",
-		__FILE__, __LINE__);
-		exit(1);
-	}
-
 	while (fgetc(fp) != '\n')
 		;
 	printf("%s-%03d:   memory allocation for pixel data\n", __FILE__, __LINE__);
-	img->data = (PPMPixel*) malloc(img->x * img->y * sizeof(PPMPixel));
+	img->data = (PPMPIXEL*) malloc(img->x * img->y * sizeof(PPMPIXEL));
 
 	if (!img) {
 		fprintf(stderr, "%s-%03d:   Unable to allocate memory\n", __FILE__,
@@ -169,11 +194,6 @@ PPMImage * parsePpmFile(FILE *fp) {
 	}
 
 	printf("%s-%03d:   read pixel data from P3 file\n", __FILE__, __LINE__);
-	/* P6 (binary) if (fread(img->data, 3 * img->x, img->y, fp) != img->y) {
-	 fprintf(stderr, "%s-%03d:   Error loading image\n", __FILE__,
-	 __LINE__);
-	 exit(1);
-	 }*/
 	int red, green, blue;
 	int i = 0;
 
@@ -187,6 +207,7 @@ PPMImage * parsePpmFile(FILE *fp) {
 	}
 
 	fclose(fp);
+
 	printf("%s-%03d:   parsepmFile end\n", __FILE__, __LINE__);
 	return img;
 }
@@ -195,7 +216,7 @@ FILE *seuillagePpmFile(void) {
 	FILE *fp = 0;
 	int i;
 	int intensity;
-	PPMImage *img;
+	PPMIMAGE *img;
 
 	printf("%s-%03d:   parsePpmFile start\n", __FILE__, __LINE__);
 	for (i = 0; i < img->x * img->y; i++) {
@@ -231,21 +252,15 @@ FILE *outputPpmFile(void) {
 	return fp;
 }
 
-void logImage(PPMImage *img) {
+
+
+void logImage(PPMIMAGE *img) {
 	int i;
 
 	printf("P3\n");
 	printf("%d %d\n", img->x, img->y);
 	printf("255\n");
 
-	/*for (x = 0; x < img->x; x+=3);
-	 {
-	 for (y = 0; y < img->y; y++);
-
-	 {
-	 printf("%d %d %d\n", img->data[x].red, img->data[x].green, img->data[x].blue);
-	 }
-	 }*/
 	for (i = 0; i < img->x * img->y; i++) {
 		printf("[%d,%d] %d %d %d\n", i % img->y, i / img->y, img->data[i].red,
 				img->data[i].green, img->data[i].blue);
@@ -256,19 +271,7 @@ void logImage(PPMImage *img) {
 
 
 
-
-
-/*
- // fonctions prédéfinies pour indiquer si les données sont correctes
-static void correct(void);
-static void erreur_nbR(int nbR);
-static void erreur_couleur(float couleur);
-static void erreur_seuil(float seuil);
-static void erreur_seuil_non_croissant(float s1, float s2);
-static void erreur_seuil_non_distinct(float s1, float s2);
-
-
- * // A appeler si toutes les données sont correctes (rendu intermédiaire)
+ // A appeler si toutes les données sont correctes (rendu intermédiaire)
 static void correct(void)
 {
 	printf("Les données sont correctes ! \n");
@@ -305,9 +308,9 @@ static void erreur_seuil_non_croissant(float s1, float s2)
 	exit(EXIT_FAILURE);
 }
 
+
 //---------------------------------------------------------------
-// A appeler si l'écart entre 2 seuils consécutifs est strictement
-inférieur à  la valeur TOLERANCE_SEUIL
+// A appeler si l'écart entre 2 seuils consécutifs est strictement inférieur à  la valeur TOLERANCE_SEUIL
 static void erreur_seuil_non_distinct(float s1, float s2)
 {
 	printf("Valeur de seuil trop proche du précédent [%5.3f]:"
@@ -315,5 +318,5 @@ static void erreur_seuil_non_distinct(float s1, float s2)
 
 	exit(EXIT_FAILURE);
 }
-*/
+
 
